@@ -15,6 +15,7 @@ java {
 
 val commonsLangVersion = "3.15.0"
 val commonsCollectionsVersion = "4.4"
+val mapstructVersion = "1.5.5.Final"
 
 configurations {
 	compileOnly {
@@ -43,6 +44,9 @@ dependencies {
 
 	annotationProcessor("org.projectlombok:lombok")
 	compileOnly("org.projectlombok:lombok")
+	
+	implementation("org.mapstruct:mapstruct:$mapstructVersion")
+	annotationProcessor("org.mapstruct:mapstruct-processor:$mapstructVersion")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
