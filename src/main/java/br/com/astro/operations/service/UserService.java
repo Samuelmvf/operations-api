@@ -15,20 +15,20 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final UserRepository userRepository;
-    private final UserMapper userMapper;
+    private final UserRepository repository;
+    private final UserMapper mapper;
 
     public UserDTO getCurrentUser(UUID userId) {
-        UserEntity user = userRepository.findById(userId)
+        UserEntity user = repository.findById(userId)
             .orElseThrow(() -> new UserNotFoundException("User not found"));
         
-        return userMapper.toDTO(user);
+        return mapper.toDTO(user);
     }
 
     public UserDTO getCurrentUserByUsername(String username) {
-        UserEntity user = userRepository.findActiveByUsername(username)
+        UserEntity user = repository.findActiveByUsername(username)
             .orElseThrow(() -> new UserNotFoundException("User not found"));
         
-        return userMapper.toDTO(user);
+        return mapper.toDTO(user);
     }
 }
