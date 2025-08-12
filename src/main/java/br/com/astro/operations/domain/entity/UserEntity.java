@@ -24,6 +24,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -57,6 +58,7 @@ public class UserEntity {
     private UserStatus status = UserStatus.ACTIVE;
 
     @Column(nullable = false, precision = 19, scale = 2)
+    @PositiveOrZero(message = "Balance cannot be negative")
     @Builder.Default
     private BigDecimal balance = BigDecimal.ZERO;
 
@@ -78,6 +80,12 @@ public class UserEntity {
 
     // BUSINESS METHODS
     public void deductBalance(BigDecimal amount) {
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Amount to deduct must be positive");
+        }
+        if (!hasEnoughBalance(amount)) {
+            throw new IllegalArgumentException("Insufficient balance. Cannot deduct " + amount + " from balance " + this.balance);
+        }
         this.balance = this.balance.subtract(amount);
     }
 
