@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import br.com.astro.operations.domain.dto.request.OperationRequestDTO;
 import br.com.astro.operations.domain.dto.response.OperationDTO;
@@ -23,7 +24,9 @@ import br.com.astro.operations.repository.OperationRepository;
 import br.com.astro.operations.repository.RecordRepository;
 import br.com.astro.operations.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class OperationService {
@@ -41,18 +44,26 @@ public class OperationService {
             .toList();
     }
 
+    @Transactional
     public OperationResponseDTO performOperation(
         OperationEntity.OperationType operationType,
         OperationRequestDTO request,
         UUID userId
     ) {
+        log.debug("Starting operation {} for user {}", operationType, userId);
+        
         OperationEntity operation = repository.findByType(operationType)
             .orElseThrow(() -> new OperationNotFoundException("Operation not found: " + operationType));
 
-        UserEntity user = userRepository.findById(userId)
+        UserEntity user = userRepository.findByIdForUpdate(userId)
             .orElseThrow(() -> new UserNotFoundException("User not found"));
 
+        log.debug("User {} current balance: {}, operation cost: {}", 
+                 userId, user.getBalance(), operation.getCost());
+
         if (!user.hasEnoughBalance(operation.getCost())) {
+            log.warn("Insufficient balance for user {}: balance={}, cost={}", 
+                    userId, user.getBalance(), operation.getCost());
             throw new InsufficientBalanceException("Insufficient balance for this operation");
         }
 
@@ -60,6 +71,8 @@ public class OperationService {
         
         user.deductBalance(operation.getCost());
         userRepository.save(user);
+
+        log.debug("Balance deducted. User {} new balance: {}", userId, user.getBalance());
 
         RecordEntity record = RecordEntity.builder()
             .operation(operation)
@@ -70,6 +83,9 @@ public class OperationService {
             .build();
         
         record = recordRepository.save(record);
+
+        log.info("Operation {} completed for user {}. Result: {}, New balance: {}", 
+                operationType, userId, result, user.getBalance());
 
         return new OperationResponseDTO(
             result,
