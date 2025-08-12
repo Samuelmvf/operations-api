@@ -24,3 +24,13 @@ server:
 app:
   random-org:
     url: https://www.random.org/strings/
+
+  jwt:
+    secret: mySecretKey
+    expiration: 86400000
+
+  users:
+    default:
+      username: admin
+      password: P@ssw0rd
+      balance: 250.00
