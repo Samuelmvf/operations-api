@@ -1,1 +1,7 @@
-spring.application.name=operations
+spring:
+  application:
+    name: operations
+
+app:
+  random-org:
+    url: https://www.random.org/strings/
