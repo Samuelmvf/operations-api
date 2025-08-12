@@ -16,6 +16,7 @@ java {
 val commonsLangVersion = "3.15.0"
 val commonsCollectionsVersion = "4.4"
 val mapstructVersion = "1.5.5.Final"
+val resilience4jVersion = "2.2.0"
 
 configurations {
 	compileOnly {
@@ -32,6 +33,12 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-rest")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-web")
+	implementation("org.springframework.boot:spring-boot-starter-webflux")
+	
+	implementation("io.github.resilience4j:resilience4j-spring-boot3:$resilience4jVersion")
+	implementation("io.github.resilience4j:resilience4j-circuitbreaker:$resilience4jVersion")
+	implementation("io.github.resilience4j:resilience4j-retry:$resilience4jVersion")
+		
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	developmentOnly("org.springframework.boot:spring-boot-docker-compose")
 
