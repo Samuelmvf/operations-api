@@ -2,6 +2,7 @@ package br.com.astro.operations.service;
 
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.com.astro.operations.domain.dto.response.UserDTO;
@@ -12,7 +13,7 @@ import br.com.astro.operations.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class UserService {
 
     private final UserRepository repository;

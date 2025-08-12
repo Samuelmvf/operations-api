@@ -26,11 +26,11 @@ app:
     url: https://www.random.org/strings/
 
   jwt:
-    secret: mySecretKey
+    secret: mySecretKeyThatIsLongEnoughForHmacSha256Algorithm
     expiration: 86400000
 
   users:
     default:
-      username: admin
+      username: admin@example.com
       password: P@ssw0rd
       balance: 250.00

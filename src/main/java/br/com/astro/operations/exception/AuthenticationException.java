@@ -1,4 +1,4 @@
-package br.com.astro.operations.domain.dto.response;
+package br.com.astro.operations.exception;
 
 public class AuthenticationException extends RuntimeException {
 

@@ -13,4 +13,9 @@ import br.com.astro.operations.domain.entity.UserEntity;
 public interface UserRepository extends JpaRepository<UserEntity, UUID> {
     @Query("SELECT u FROM UserEntity u WHERE u.username = :username AND u.deleted = false")
     Optional<UserEntity> findActiveByUsername(String username);
+
+    boolean existsByUsername(String username);
+
+    Optional<UserEntity> findByUsername(String username);
+
 }

@@ -9,12 +9,13 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import br.com.astro.operations.domain.dto.response.AuthenticationException;
 import br.com.astro.operations.domain.dto.response.ErrorResponseDTO;
+import br.com.astro.operations.exception.AuthenticationException;
 import br.com.astro.operations.exception.InsufficientBalanceException;
 import br.com.astro.operations.exception.InvalidOperationException;
 import br.com.astro.operations.exception.OperationNotFoundException;
 import br.com.astro.operations.exception.RecordNotFoundException;
+import br.com.astro.operations.exception.UserAlreadyExistsException;
 import br.com.astro.operations.exception.UserNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -32,6 +33,19 @@ public class GlobalExceptionHandler {
             request.getRequestURI()
         );
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponseDTO> handleUserAlreadyExistsException(
+        UserAlreadyExistsException ex, HttpServletRequest request
+    ) {
+        ErrorResponseDTO error = ErrorResponseDTO.of(
+            HttpStatus.BAD_REQUEST.value(),
+            "User Already Exists",
+            ex.getMessage(),
+            request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
     @ExceptionHandler(InsufficientBalanceException.class)
@@ -105,4 +119,5 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }
+
 }
