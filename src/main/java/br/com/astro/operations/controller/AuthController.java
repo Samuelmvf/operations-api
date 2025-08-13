@@ -4,10 +4,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.astro.operations.domain.dto.request.LoginRequestDTO;
+import br.com.astro.operations.domain.dto.request.RefreshTokenRequestDTO;
 import br.com.astro.operations.domain.dto.request.RegisterRequestDTO;
 import br.com.astro.operations.domain.dto.response.AuthResponseDTO;
 import br.com.astro.operations.service.AuthService;
@@ -54,5 +56,35 @@ public class AuthController {
     public ResponseEntity<AuthResponseDTO> register(@Valid @RequestBody RegisterRequestDTO request) {
         AuthResponseDTO response = service.register(request);
         return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Refresh token", description = "Refresh a JWT token")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Token refreshed successfully",
+                content = @Content(schema = @Schema(implementation = AuthResponseDTO.class))),
+        @ApiResponse(responseCode = "401", description = "Invalid refresh token",
+                content = @Content),
+        @ApiResponse(responseCode = "400", description = "Invalid input",
+                content = @Content)
+    })
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponseDTO> refreshToken(@Valid @RequestBody RefreshTokenRequestDTO request) {
+        AuthResponseDTO response = service.refreshToken(request.refreshToken());
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "Logout user", description = "Logout user and invalidate JWT token")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Logout successful"),
+        @ApiResponse(responseCode = "401", description = "Invalid token",
+                content = @Content)
+    })
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(@RequestHeader("Authorization") String authHeader) {
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            service.logout(token);
+        }
+        return ResponseEntity.ok().build();
     }
 }
