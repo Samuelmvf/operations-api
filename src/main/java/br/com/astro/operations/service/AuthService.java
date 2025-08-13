@@ -1,5 +1,7 @@
 package br.com.astro.operations.service;
 
+import java.math.BigDecimal;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -50,7 +52,7 @@ public class AuthService {
         UserEntity user = UserEntity.builder()
             .username(request.username())
             .password(passwordEncoder.encode(request.password()))
-            .balance(request.initialBalance())
+            .balance(BigDecimal.valueOf(250.00))
             .status(UserEntity.UserStatus.ACTIVE)
             .deleted(false)
             .build();
