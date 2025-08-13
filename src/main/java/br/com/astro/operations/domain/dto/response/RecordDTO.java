@@ -5,7 +5,9 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import br.com.astro.operations.domain.entity.OperationEntity;
+import lombok.Builder;
 
+@Builder
 public record RecordDTO(
     UUID id,
     UUID operationId,

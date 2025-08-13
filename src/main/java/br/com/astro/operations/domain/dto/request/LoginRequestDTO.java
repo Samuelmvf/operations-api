@@ -2,7 +2,9 @@ package br.com.astro.operations.domain.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import lombok.Builder;
 
+@Builder
 public record LoginRequestDTO(
     @NotBlank(message = "Username is required")
     @Email(message = "Username must be a valid email")
