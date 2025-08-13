@@ -4,13 +4,15 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 public record AuthResponseDTO(
-    String token,
+    String accessToken,
+    String refreshToken,
     String type,
     UUID userId,
     String username,
-    BigDecimal balance
+    BigDecimal balance,
+    long expiresIn
 ) {
-    public static AuthResponseDTO of(String token, UUID userId, String username, BigDecimal balance) {
-        return new AuthResponseDTO(token, "Bearer", userId, username, balance);
+    public static AuthResponseDTO of(String accessToken, String refreshToken, UUID userId, String username, BigDecimal balance, long expiresIn) {
+        return new AuthResponseDTO(accessToken, refreshToken, "Bearer", userId, username, balance, expiresIn);
     }
 }
