@@ -8,14 +8,19 @@ spring:
     password: secret
 
   jpa:
-    open-in-view: false
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: validate
+    show-sql: false
     properties:
       hibernate:
-        show_sql: true
-        format_sql: false
         dialect: org.hibernate.dialect.MariaDBDialect
+        format_sql: true
+    open-in-view: false
+
+  flyway:
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    validate-on-migrate: true
 
 server:
   servlet:
@@ -34,3 +39,11 @@ app:
       username: admin@example.com
       password: P@ssw0rd
       balance: 250.00
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
