@@ -67,6 +67,10 @@ dependencies {
 	
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("com.h2database:h2")
+	testImplementation("org.mockito:mockito-junit-jupiter:5.12.0")
+	testImplementation("org.mockito:mockito-inline:5.2.0")
+	testImplementation("org.springframework.security:spring-security-test")
+	
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
