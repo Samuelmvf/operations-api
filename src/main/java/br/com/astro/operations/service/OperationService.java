@@ -38,10 +38,13 @@ public class OperationService {
     private final OperationMapper mapper;
 
     public List<OperationDTO> getAllOperations() {
-        return repository.findAll()
+        log.debug("Fetching all available operations");
+        List<OperationDTO> operations = repository.findAll()
             .stream()
             .map(mapper::toDTO)
             .toList();
+        log.debug("Found {} operations", operations.size());
+        return operations;
     }
 
     @Transactional
