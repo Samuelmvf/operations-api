@@ -45,6 +45,9 @@ jobs:
       JWT_REFRESH_EXPIRATION: ${{ secrets.JWT_REFRESH_EXPIRATION }}
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
       - name: Configure AWS CLI
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -70,8 +73,54 @@ jobs:
       - name: Known hosts
         run: ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
 
+      - name: Ensure remote app directory
+        run: ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "sudo mkdir -p /opt/operations-api"
+
       - name: Copy JAR to EC2
         run: scp "${{ steps.jar.outputs.JAR_FILE }}" ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/opt/operations-api/app.jar
+
+      - name: Copy compose.yaml to EC2 (if present)
+        run: |
+          if [ -f compose.yaml ]; then
+            scp compose.yaml ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/opt/operations-api/compose.yaml
+          fi
+
+      - name: Render environment file
+        run: |
+          cat > operations-api.env <<EOF
+          DB_URL=${DB_URL}
+          DB_USERNAME=${DB_USERNAME}
+          DB_PASSWORD=${DB_PASSWORD}
+          JWT_SECRET=${JWT_SECRET}
+          JWT_EXPIRATION=${JWT_EXPIRATION}
+          JWT_REFRESH_EXPIRATION=${JWT_REFRESH_EXPIRATION}
+          EOF
+
+      - name: Upload environment file to EC2
+        run: scp operations-api.env ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/tmp/operations-api.env
+
+      - name: Move env file and create/update systemd service
+        run: |
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "sudo mv /tmp/operations-api.env /etc/default/operations-api && sudo chown root:root /etc/default/operations-api && sudo chmod 600 /etc/default/operations-api && sudo tee /etc/systemd/system/operations-api.service >/dev/null <<'EOF'
+          [Unit]
+          Description=Operations API
+          After=network.target
+
+          [Service]
+          User=ubuntu
+          WorkingDirectory=/opt/operations-api
+          EnvironmentFile=/etc/default/operations-api
+          ExecStart=/usr/bin/java -jar /opt/operations-api/app.jar
+          SuccessExitStatus=143
+          Restart=always
+          RestartSec=5
+          AmbientCapabilities=CAP_NET_BIND_SERVICE
+          CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+
+          [Install]
+          WantedBy=multi-user.target
+          EOF
+          && sudo systemctl daemon-reload && sudo systemctl enable operations-api || true"
 
       - name: Restart service
         run: |
