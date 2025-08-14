@@ -2,8 +2,6 @@ services:
   mariadb-service:
     container_name: mariadb-container
     image: "mariadb:latest"
-    env_file:
-      - /etc/default/operations-api
     environment:
       MARIADB_DATABASE: ${DB_NAME}
       MARIADB_USER: ${DB_USERNAME}
