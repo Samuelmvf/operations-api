@@ -37,6 +37,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
 
     env:
+      DB_NAME: ${{ secrets.DB_NAME }}
       DB_URL: ${{ secrets.DB_URL }}
       DB_USERNAME: ${{ secrets.DB_USERNAME }}
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
@@ -91,6 +92,7 @@ jobs:
       - name: Render environment file
         run: |
           cat > operations-api.env <<EOF
+          DB_NAME=${DB_NAME}
           DB_URL=${DB_URL}
           DB_USERNAME=${DB_USERNAME}
           DB_PASSWORD=${DB_PASSWORD}

@@ -2,11 +2,13 @@ services:
   mariadb-service:
     container_name: mariadb-container
     image: "mariadb:latest"
+    env_file:
+      - /etc/default/operations-api
     environment:
-      MARIADB_DATABASE: operations_db
-      MARIADB_USER: operations
-      MARIADB_PASSWORD: secret
-      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: ${DB_NAME}
+      MARIADB_USER: ${DB_USERNAME}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${DB_PASSWORD}
     ports:
       - "3306:3306"
     expose:
