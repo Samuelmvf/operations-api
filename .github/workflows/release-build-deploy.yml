@@ -80,6 +80,18 @@ jobs:
       - name: Ensure remote app directory
         run: ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "sudo mkdir -p /opt/operations-api"
 
+      - name: Ensure Java on EC2
+        run: |
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} 'bash -s' <<'REMOTE_CMDS'
+          set -e
+          if ! command -v java >/dev/null 2>&1; then
+            sudo apt-get update
+            # Prefer JRE 21; fallback to default-jre if repo does not provide it
+            sudo apt-get install -y openjdk-21-jdk
+          fi
+          java -version || true
+          REMOTE_CMDS
+
       - name: Copy JAR to EC2
         run: scp "${{ steps.jar.outputs.JAR_FILE }}" ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/opt/operations-api/app.jar
 
