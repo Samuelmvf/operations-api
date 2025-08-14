@@ -61,9 +61,12 @@ jobs:
           name: operations-api-jar
           path: .
 
-      - name: Select JAR
+      - name: Select JAR (boot jar, not -plain)
         id: jar
-        run: echo "JAR_FILE=$(ls *.jar | head -n1)" >> "$GITHUB_OUTPUT"
+        run: |
+          JAR=$(ls *.jar | grep -v 'plain' | head -n1)
+          if [ -z "$JAR" ]; then echo "No boot JAR found" && ls -lah && exit 1; fi
+          echo "JAR_FILE=$JAR" >> "$GITHUB_OUTPUT"
 
       - name: Add SSH key
         uses: webfactory/ssh-agent@v0.9.0
