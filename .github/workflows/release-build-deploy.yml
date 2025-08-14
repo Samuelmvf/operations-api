@@ -134,6 +134,34 @@ jobs:
           sudo systemctl enable operations-api || true
           REMOTE_CMDS
 
+      - name: Prepare Docker and run docker-compose on EC2
+        run: |
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} 'bash -s' <<'REMOTE_CMDS'
+          set -e
+          # Ensure Docker installed and running
+          if ! command -v docker >/dev/null 2>&1; then
+            sudo apt update
+            sudo apt install -y docker.io
+            sudo systemctl enable --now docker
+            sudo usermod -aG docker ubuntu || true
+          fi
+          # Ensure docker-compose (legacy) or compose plugin available
+          if ! docker compose version >/dev/null 2>&1 && ! command -v docker-compose >/dev/null 2>&1; then
+            sudo apt update
+            sudo apt install -y docker-compose
+          fi
+          cd /opt/operations-api
+          # Generate .env for compose from system env file
+          sudo bash -c 'set -a; source /etc/default/operations-api; set +a; printf "DB_NAME=%s\nDB_USERNAME=%s\nDB_PASSWORD=%s\n" "$DB_NAME" "$DB_USERNAME" "$DB_PASSWORD" > .env'
+          sudo chown ubuntu:ubuntu .env || true
+          # Run compose
+          if command -v docker-compose >/dev/null 2>&1; then
+            docker-compose up -d
+          else
+            docker compose up -d
+          fi
+          REMOTE_CMDS
+
       - name: Restart service
         run: |
           ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "sudo systemctl restart operations-api && sudo systemctl status --no-pager operations-api | cat"
