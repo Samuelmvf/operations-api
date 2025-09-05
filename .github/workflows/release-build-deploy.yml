@@ -2,7 +2,7 @@ name: Release Build and Deploy
 
 on:
   push:
-    tags: [v*.*.*]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
