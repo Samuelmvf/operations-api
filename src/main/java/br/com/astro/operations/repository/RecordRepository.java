@@ -27,7 +27,7 @@ public interface RecordRepository extends JpaRepository<RecordEntity, UUID> {
         JOIN FETCH r.operation 
         WHERE r.user.id = :userId 
         AND r.deleted = false 
-        AND (r.operationResponse LIKE %:search% OR r.operation.type LIKE %:search%)
+        AND (r.operationResponse LIKE CONCAT('%', :search, '%') OR CAST(r.operation.type AS string) LIKE CONCAT('%', :search, '%'))
         """)
     Page<RecordEntity> findByUserIdAndSearchWithOperation(
         @Param("userId") UUID userId, 
